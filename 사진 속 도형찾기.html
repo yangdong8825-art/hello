@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알록달록 도형 탐험대</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #f0f3ff;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .title-text h1 {
+            font-size: 22px;
+            color: #1e1b4b;
+        }
+
+        .title-text p {
+            font-size: 14px;
+            color: #6366f1;
+        }
+
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .btn-outline:hover {
+            background: #c7d2fe;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-badge {
+            background: #4f46e5;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .upload-area {
+            border: 2px dashed #c7d2fe;
+            background: #eef2ff;
+            border-radius: 15px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .upload-area:hover {
+            background: #e0e7ff;
+            border-color: #818cf8;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .color-dot:hover, .color-dot.active {
+            transform: scale(1.15);
+            box-shadow: 0 0 0 3px #4f46e5;
+        }
+
+        .canvas-area-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .canvas-wrapper {
+            background: white;
+            border-radius: 20px;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        #mainCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        .placeholder-icon {
+            font-size: 60px;
+            color: #c7d2fe;
+            text-align: center;
+        }
+
+        /* 팝업 모달 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .modal input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            outline: none;
+            text-align: left;
+        }
+
+        .modal input[type="text"]:focus {
+            border-color: #4f46e5;
+        }
+
+        .modal-btns {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 상단 탐지 결과 상자 */
+        .summary-box {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .loading-spinner {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #c7d2fe;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo-title">
+            <div class="logo-icon">▲</div>
+            <div class="title-text">
+                <h1>알록달록 도형 탐험대</h1>
+                <p>사진 속에서 여러가지 도형을 찾아보고 색칠해요</p>
+            </div>
+        </div>
+        <button class="btn btn-outline" id="openApiModalBtn">🔑 API 키 설정</button>
+    </header>
+
+    <div class="main-grid">
+        <!-- 컨트롤 패널 -->
+        <div class="controls">
+            <div class="card">
+                <div class="card-title">
+                    <span class="step-badge">1</span> 사진 올리기
+                </div>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <p style="font-size: 30px; margin-bottom: 5px;">📷</p>
+                    <p style="font-weight: bold; color: #4338ca;">사진 선택하기</p>
+                    <p style="font-size: 12px; color: #888; margin-top: 4px;">도형이 들어있는 사진을 클릭하세요</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <button class="btn" id="detectBtn" style="width: 100%; margin-top: 15px;" disabled>✨ 도형 찾기 시작!</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="step-badge">2</span> 색상 및 도구
+                </div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">색상 선택</p>
+                <div class="color-palette" id="palette">
+                    <div class="color-dot active" style="background: #f87171;" data-color="#f87171"></div>
+                    <div class="color-dot" style="background: #fb923c;" data-color="#fb923c"></div>
+                    <div class="color-dot" style="background: #facc15;" data-color="#facc15"></div>
+                    <div class="color-dot" style="background: #34d399;" data-color="#34d399"></div>
+                    <div class="color-dot" style="background: #38bdf8;" data-color="#38bdf8"></div>
+                    <div class="color-dot" style="background: #818cf8;" data-color="#818cf8"></div>
+                    <div class="color-dot" style="background: #f472b6;" data-color="#f472b6"></div>
+                    <div class="color-dot" style="background: #b45309;" data-color="#b45309"></div>
+                    <div class="color-dot" style="background: #475569;" data-color="#475569"></div>
+                    <div class="color-dot" style="background: #000000;" data-color="#000000"></div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <p style="font-size: 12px; color: #666; margin-bottom: 5px;">브러시 크기</p>
+                    <input type="range" id="brushSize" min="10" max="60" value="30" style="width: 100%;">
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline" id="eraserBtn" style="flex: 1;">🧹 지우개</button>
+                    </div>
+                    <button class="btn btn-outline" id="resetBtn" style="width: 100%; color: #dc2626;" disabled>🔄 다시하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 캔버스 영역 및 상단 탐지 결과 -->
+        <div class="canvas-area-container">
+            <div class="summary-box" id="resultSummary" style="display: none;">
+                <p style="font-weight: bold; margin-bottom: 4px;">📊 탐지 결과</p>
+                <div id="summaryContent" style="font-size: 14px; line-height: 1.4;"></div>
+            </div>
+
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <div class="placeholder-icon" id="placeholder">🖼️</div>
+                <canvas id="mainCanvas" style="display: none;"></canvas>
+
+                <div class="loading-spinner" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p id="loadingText">도형을 찾는 중.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- API 키 입력 모달 -->
+<div class="modal-overlay" id="apiModal">
+    <div class="modal">
+        <h2>🔑 Google AI Studio API 키 입력</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">발급받으신 Gemini API 키를 입력해 주세요.</p>
+        <input type="text" id="apiKeyInput" placeholder="AIzaSy...">
+        <div class="modal-btns">
+            <button class="btn btn-outline" onclick="closeModal()">취소</button>
+            <button class="btn" onclick="saveApiKey()">저장하기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 성공 축하 모달 (모든 도형 색칠 완료 시) -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal" style="background: linear-gradient(135deg, #ffffff, #f0f3ff);">
+        <p style="font-size: 60px; margin-bottom: 10px;">🎉</p>
+        <h2 style="font-size: 24px; color: #4f46e5; margin-bottom: 10px;">잘했어요! 👍</h2>
+        <p style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 20px;">도형을 전부 다 색칠했어요.</p>
+        <div class="modal-btns">
+            <button class="btn" onclick="closeSuccessModal()">멋져요!</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let apiKey = localStorage.getItem('gemini_api_key') || '';
+    let currentImg = null;
+    let detectedShapes = [];
+    let currentColor = '#f87171';
+    let isEraser = false;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const fillCanvas = document.createElement('canvas');
+    const fillCtx = fillCanvas.getContext('2d', { willReadFrequently: true });
+
+    const apiModal = document.getElementById('apiModal');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const successModal = document.getElementById('successModal');
+
+    function playSuccessSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            
+            const notes = [261.63, 329.63, 392.00, 523.25];
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                
+                const startTime = audioCtx.currentTime + index * 0.1;
+                gain.gain.setValueAtTime(0.3, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(startTime);
+                osc.stop(startTime + 0.3);
+            });
+        } catch (e) {}
+    }
+
+    document.getElementById('openApiModalBtn').addEventListener('click', () => {
+        apiKeyInput.value = apiKey;
+        apiModal.classList.add('active');
+    });
+
+    function closeModal() {
+        apiModal.classList.remove('active');
+    }
+
+    function closeSuccessModal() {
+        successModal.classList.remove('active');
+    }
+
+    function saveApiKey() {
+        apiKey = apiKeyInput.value.trim();
+        localStorage.setItem('gemini_api_key', apiKey);
+        alert('API 키가 저장되었습니다!');
+        closeModal();
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                currentImg = img;
+                resetToInitialState();
+                document.getElementById('placeholder').style.display = 'none';
+                canvas.style.display = 'block';
+                document.getElementById('detectBtn').disabled = false;
+                document.getElementById('resetBtn').disabled = false;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function resetToInitialState() {
+        detectedShapes = [];
+        fillCtx.clearRect(0, 0, fillCanvas.width, fillCanvas.height);
+        document.getElementById('resultSummary').style.display = 'none';
+        renderInitialImage();
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        if (currentImg) {
+            resetToInitialState();
+            speak('도형을 찾기 전 사진으로 돌아왔습니다.');
+        }
+    });
+
+    function renderInitialImage() {
+        const wrapper = document.getElementById('canvasWrapper');
+        const maxW = wrapper.clientWidth - 20;
+        const maxH = 600;
+
+        let w = currentImg.width;
+        let h = currentImg.height;
+
+        const ratio = Math.min(maxW / w, maxH / h);
+        canvas.width = w * ratio;
+        canvas.height = h * ratio;
+
+        fillCanvas.width = canvas.width;
+        fillCanvas.height = canvas.height;
+
+        redrawFullCanvas();
+    }
+
+    document.getElementById('detectBtn').addEventListener('click', async function() {
+        if (!apiKey) {
+            alert('먼저 API 키를 입력해 주세요!');
+            document.getElementById('openApiModalBtn').click();
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loadingText').innerText = "도형을 찾는 중.";
+
+        const base64Data = canvas.toDataURL('image/jpeg').split(',')[1];
+        
+        const prompt = `Analyze this image and identify shape types and boundaries. EXCLUDE star and heart.
+        IMPORTANT: Be flexible with TRIANGLES. Any real-world object with a roughly triangular or 3-corner structure (e.g., roof, wedge, sign, slice, arrow head) should be detected as a triangle.
+        
+        Classify shapes into:
+        - Circle / Ellipse: "원" (circle), "타원" (ellipse)
+        - Triangles: "정삼각형" (equilateral_triangle), "이등변삼각형" (isosceles_triangle), "직각삼각형" (right_triangle), or general "삼각형" (triangle)
+        - Quadrilaterals: "정사각형" (square), "직사각형" (rectangle), or general "사각형" (quadrilateral)
+
+        Return ONLY a JSON array of objects.
+        Each object MUST contain:
+        - "name": Korean shape name ("원", "타원", "정삼각형", "이등변삼각형", "직각삼각형", "정사각형", "직사각형", "삼각형", "사각형" 등)
+        - "type": "circle" | "ellipse" | "equilateral_triangle" | "isosceles_triangle" | "right_triangle" | "triangle" | "square" | "rectangle"
+        - "box_2d": [ymin, xmin, ymax, xmax] normalized from 0 to 1000.
+        Example: [{"name":"삼각형", "type":"triangle", "box_2d":[100,200,300,400]}]`;
+
+        const candidateModels = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'];
+        let successData = null;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+        try {
+            for (const model of candidateModels) {
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: prompt },
+                                    { inline_data: { mime_type: 'image/jpeg', data: base64Data } }
+                                ]
+                            }]
+                        })
+                    });
+                    const data = await response.json();
+                    if (!data.error) {
+                        successData = data;
+                        break;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') throw e;
+                }
+            }
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                document.getElementById('loading').style.display = 'none';
+                alert('다른 사진으로 다시 시도해주세요.');
+                return;
+            }
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
+        document.getElementById('loading').style.display = 'none';
+
+        if (!successData) {
+            alert('다른 사진으로 다시 시도해주세요.');
+            return;
+        }
+
+        try {
+            let text = successData.candidates[0].content.parts[0].text;
+            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            detectedShapes = JSON.parse(text);
+
+            drawShapesAndSummary();
+            speak('사진 속 도형들을 모두 찾았어요! 테두리 안쪽을 예쁘게 색칠해보세요!');
+        } catch (err) {
+            alert('다른 사진으로 다시 시도해주세요.');
+        }
+    });
+
+    function drawShapesAndSummary() {
+        fillCtx.clearRect(0, 0, fillCanvas.width, fillCanvas.height);
+        
+        const shapeCounts = {};
+
+        detectedShapes.forEach(shape => {
+            shapeCounts[shape.name] = (shapeCounts[shape.name] || 0) + 1;
+
+            const [ymin, xmin, ymax, xmax] = shape.box_2d;
+            const x = (xmin / 1000) * canvas.width;
+            const y = (ymin / 1000) * canvas.height;
+            const w = ((xmax - xmin) / 1000) * canvas.width;
+            const h = ((ymax - ymin) / 1000) * canvas.height;
+
+            shape.canvasBounds = { x, y, w, h, completed: false };
+        });
+
+        redrawFullCanvas();
+
+        let html = `총 <b>${detectedShapes.length}개</b>의 도형 발견! ( `;
+        const summaryItems = [];
+        for (const [name, count] of Object.entries(shapeCounts)) {
+            summaryItems.push(`${name}: ${count}개`);
+        }
+        html += summaryItems.join(' / ') + ' )';
+
+        document.getElementById('summaryContent').innerHTML = html;
+        document.getElementById('resultSummary').style.display = 'block';
+    }
+
+    function defineShapePath(context, shape) {
+        const { x, y, w, h } = shape.canvasBounds;
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        const type = shape.type || 'rectangle';
+
+        context.beginPath();
+
+        if (type === 'circle' || type === 'ellipse') {
+            const rx = w / 2;
+            const ry = h / 2;
+            context.ellipse(cx, cy, Math.abs(rx), Math.abs(ry), 0, 0, 2 * Math.PI);
+        } else if (type === 'right_triangle') {
+            context.moveTo(x, y);
+            context.lineTo(x, y + h);
+            context.lineTo(x + w, y + h);
+            context.closePath();
+        } else if (type === 'equilateral_triangle' || type === 'isosceles_triangle' || type === 'triangle') {
+            context.moveTo(cx, y);
+            context.lineTo(x + w, y + h);
+            context.lineTo(x, y + h);
+            context.closePath();
+        } else {
+            context.rect(x, y, w, h);
+        }
+    }
+
+    function redrawFullCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (currentImg) {
+            ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+        }
+
+        ctx.drawImage(fillCanvas, 0, 0);
+
+        detectedShapes.forEach(shape => {
+            if (!shape.canvasBounds) return;
+
+            defineShapePath(ctx, shape);
+
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const { x, y, h } = shape.canvasBounds;
+            const tagY = Math.min(canvas.height - 24, y + h + 6);
+            const tagW = Math.max(60, shape.name.length * 16);
+
+            ctx.fillStyle = '#4f46e5';
+            ctx.fillRect(x, tagY, tagW, 24);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px Pretendard';
+            ctx.fillText(shape.name, x + 6, tagY + 17);
+        });
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
+    canvas.addEventListener('touchmove', (e) => {
+        draw(e.touches[0]);
+        e.preventDefault();
+    });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    function startDrawing(e) {
+        if (!detectedShapes.length) return;
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        lastX = e.clientX - rect.left;
+        lastY = e.clientY - rect.top;
+        draw(e);
+    }
+
+    function draw(e) {
+        if (!isDrawing || !detectedShapes.length) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const currX = e.clientX - rect.left;
+        const currY = e.clientY - rect.top;
+        const size = document.getElementById('brushSize').value;
+
+        detectedShapes.forEach(shape => {
+            if (!shape.canvasBounds) return;
+
+            fillCtx.save();
+            defineShapePath(fillCtx, shape);
+            fillCtx.clip();
+
+            fillCtx.lineWidth = size;
+            fillCtx.lineCap = 'round';
+            fillCtx.lineJoin = 'round';
+
+            if (isEraser) {
+                fillCtx.globalCompositeOperation = 'destination-out';
+            } else {
+                fillCtx.globalCompositeOperation = 'source-over';
+                fillCtx.strokeStyle = currentColor;
+            }
+
+            fillCtx.beginPath();
+            fillCtx.moveTo(lastX, lastY);
+            fillCtx.lineTo(currX, currY);
+            fillCtx.stroke();
+
+            fillCtx.restore();
+        });
+
+        lastX = currX;
+        lastY = currY;
+
+        redrawFullCanvas();
+        check90PercentCompletion();
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    // 도형 색칠 완성 및 전체 완칠 검사 로직
+    function check90PercentCompletion() {
+        detectedShapes.forEach(shape => {
+            if (!shape.canvasBounds || shape.canvasBounds.completed) return;
+
+            const { x, y, w, h } = shape.canvasBounds;
+            if (w <= 0 || h <= 0) return;
+
+            const imgData = fillCtx.getImageData(x, y, w, h);
+            const pixels = imgData.data;
+            let coloredCount = 0;
+            let totalSampled = 0;
+
+            for (let i = 0; i < pixels.length; i += 16) {
+                totalSampled++;
+                if (pixels[i + 3] > 100) coloredCount++;
+            }
+
+            const fillRatio = coloredCount / totalSampled;
+
+            if (fillRatio >= 0.82) {
+                shape.canvasBounds.completed = true;
+
+                fillCtx.save();
+                defineShapePath(fillCtx, shape);
+                fillCtx.clip();
+                fillCtx.fillStyle = currentColor;
+                fillCtx.fillRect(x, y, w, h);
+                fillCtx.restore();
+
+                redrawFullCanvas();
+
+                // 개별 완성 시에는 음성 안내만 제공
+                speak(`${shape.name} 완성!`);
+
+                // 모든 도형이 완성되었는지 체크
+                checkAllShapesCompleted();
+            }
+        });
+    }
+
+    // 사진 속 모든 도형을 다 채웠는지 확인하는 함수
+    function checkAllShapesCompleted() {
+        if (!detectedShapes.length) return;
+
+        const allCompleted = detectedShapes.every(shape => shape.canvasBounds && shape.canvasBounds.completed);
+
+        if (allCompleted) {
+            setTimeout(() => {
+                playSuccessSound();
+                speak('잘했어요! 도형을 전부 다 색칠했어요.');
+                successModal.classList.add('active');
+            }, 300);
+        }
+    }
+
+    document.querySelectorAll('.color-dot').forEach(dot => {
+        dot.addEventListener('click', function() {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            this.classList.add('active');
+            currentColor = this.dataset.color;
+            isEraser = false;
+        });
+    });
+
+    document.getElementById('eraserBtn').addEventListener('click', () => {
+        isEraser = true;
+    });
+
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ko-KR';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+        }
+    }
+</script>
+
+</body>
+</html>
