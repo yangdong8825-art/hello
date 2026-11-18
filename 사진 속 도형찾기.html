@@ -1,1522 +1,850 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>전통 윷놀이</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알록달록 도형 탐험대</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+            user-select: none;
+        }
 
-    :root {
-      --red: #c0392b;
-      --red-bg: #fde8e8;
-      --blue: #2980b9;
-      --blue-bg: #e8f4fc;
-      --green: #27ae60;
-      --green-bg: #eafaf1;
-      --wood-bg: #f4ece1;
-      --wood-border: #8c531b;
-      --paper-bg: #faf7f2;
-    }
+        body {
+            background-color: #f0f3ff;
+            color: #333;
+            padding: 20px;
+        }
 
-    body {
-      font-family: 'Gowun Batang', 'Malgun Gothic', serif;
-      background-color: #e8ded1;
-      background-image: radial-gradient(#d4c4b0 1px, transparent 1px);
-      background-size: 20px 20px;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #333;
-      font-size: 20px;
-    }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
 
-    .card {
-      background: var(--paper-bg);
-      padding: 25px;
-      border-radius: 16px;
-      border: 4px double var(--wood-border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      width: 100%;
-      max-width: 1150px;
-      box-sizing: border-box;
-    }
+        header {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
 
-    h1 { font-size: 42px; text-align: center; color: #4a2c11; margin-top: 0; }
-    h2 { font-size: 32px; text-align: center; color: #4a2c11; margin-top: 0; }
-    h3 { font-size: 24px; color: #4a2c11; margin-top: 10px; margin-bottom: 10px; }
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-    /* 시작 화면 */
-    #start-screen { padding: 10px; }
-    .form-group {
-      margin: 18px 0;
-      background: #eee5d8;
-      padding: 18px 22px;
-      border-radius: 10px;
-      border: 1px solid #d4c0a8;
-      font-size: 20px;
-    }
-    label { font-weight: bold; display: block; margin-bottom: 10px; color: #5a3d28; font-size: 22px; }
-    select, input[type="text"], input[type="number"] {
-      padding: 10px 14px;
-      font-size: 19px;
-      font-family: inherit;
-      border-radius: 6px;
-      border: 1px solid #b89b7d;
-      background: #fff;
-    }
-    
-    .piece-config-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 15px;
-      margin-top: 12px;
-    }
-    .team-config-card {
-      background: #fff;
-      padding: 14px;
-      border-radius: 8px;
-      border: 1px solid #c8b29b;
-    }
-    
-    .piece-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-    .piece-input-row span { white-space: nowrap; font-weight: bold; width: auto; min-width: 85px; }
-    .piece-input-row input { flex: 1; }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    .btn-primary {
-      background-color: #8c531b;
-      color: #fff;
-      border: none;
-      padding: 18px 45px;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      display: block;
-      margin: 25px auto 0 auto;
-    }
+        .title-text h1 {
+            font-size: 22px;
+            color: #1e1b4b;
+        }
 
-    /* 게임 화면 */
-    #game-screen { display: none; flex-direction: column; gap: 15px; }
-    .game-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #d4c0a8;
-      padding-bottom: 12px;
-    }
+        .title-text p {
+            font-size: 14px;
+            color: #6366f1;
+        }
 
-    .header-btns { display: flex; gap: 10px; }
-    .header-btns button {
-      padding: 10px 16px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 8px;
-      border: 1px solid #8c531b;
-      background: #fff;
-    }
-    .btn-stop {
-      background: #c0392b !important;
-      color: white !important;
-      border-color: #922b21 !important;
-    }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    .main-layout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: flex-start;
-      justify-content: center;
-    }
+        .btn:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
 
-    /* 왼쪽 영역 */
-    .left-section { display: flex; flex-direction: column; gap: 14px; width: 620px; }
+        .btn-outline {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
 
-    .left-panel {
-      position: relative;
-      width: 620px;
-      height: 620px;
-      background-color: var(--wood-bg);
-      border: 8px solid var(--wood-border);
-      border-radius: 16px;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-      box-sizing: border-box;
-    }
+        .btn-outline:hover {
+            background: #c7d2fe;
+        }
 
-    #board-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-    #board-container { position: relative; width: 100%; height: 100%; z-index: 2; }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-    /* 원 노드 */
-    .board-node {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      background-color: #fdfbf7;
-      border: 2px solid var(--wood-border);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 16px;
-      font-weight: bold;
-      color: #6e3e11;
-      transform: translate(-50%, -50%);
-      text-align: center;
-    }
-    .board-node.special-node {
-      width: 62px;
-      height: 62px;
-      border-color: #d35400;
-      background-color: #f39c12;
-      color: #fff;
-      font-size: 14px;
-      line-height: 1.1;
-    }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+        }
 
-    /* 대기 공간 */
-    .waiting-area {
-      width: 620px;
-      box-sizing: border-box;
-      background: #fff;
-      border: 2px dashed #8c531b;
-      border-radius: 10px;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    .waiting-title { font-size: 18px; font-weight: bold; color: #5a3d28; white-space: nowrap; }
-    .waiting-pieces-box { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-height: 40px; align-items: center; }
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    /* 완주 현황판 */
-    .finish-board {
-      width: 620px;
-      box-sizing: border-box;
-      background: linear-gradient(135deg, #fff9e6 0%, #f7e3ba 100%);
-      padding: 6px 12px;
-      border-radius: 12px;
-      border: 2px dashed #d35400;
-      text-align: center;
-    }
-    .finish-board h3 { margin: 0 0 4px 0; font-size: 18px; color: #b73e27; }
-    .finish-status-items { display: flex; justify-content: space-around; font-size: 15px; font-weight: bold; flex-wrap: nowrap; gap: 8px; }
-    .finish-item {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 4px 8px;
-      border-radius: 8px;
-      border: 1px solid #e2b078;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 6px;
-      min-width: auto;
-    }
-    .finish-pieces-tags { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
-    .finish-tag {
-      font-size: 13px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      color: white;
-      font-weight: bold;
-    }
-    .finish-tag.Red { background-color: var(--red); }
-    .finish-tag.Blue { background-color: var(--blue); }
-    .finish-tag.Green { background-color: var(--green); }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
 
-    /* 오른쪽 컨트롤 패널 */
-    .right-panel {
-      width: 360px;
-      background: #f7f1e5;
-      padding: 18px;
-      border-radius: 12px;
-      border: 1px solid #d4c0a8;
-      box-sizing: border-box;
-    }
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .turn-indicator {
-      font-size: 22px;
-      font-weight: bold;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      line-height: 1.3;
-    }
-    .turn-Red { background: #fadbd8; color: var(--red); border: 2px solid var(--red); }
-    .turn-Blue { background: #d4e6f1; color: var(--blue); border: 2px solid var(--blue); }
-    .turn-Green { background: #d5f5e3; color: var(--green); border: 2px solid var(--green); }
+        .step-badge {
+            background: #4f46e5;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
 
-    .current-thrower-box {
-      margin-top: 6px;
-      font-size: 20px;
-      color: #2c3e50;
-      background: rgba(255,255,255,0.7);
-      padding: 6px 10px;
-      border-radius: 6px;
-      display: block;
-    }
+        .upload-area {
+            border: 2px dashed #c7d2fe;
+            background: #eef2ff;
+            border-radius: 15px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-    .piece-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-      width: 100%;
-    }
-    
-    .piece-select-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 6px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: bold;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-      box-sizing: border-box;
-      text-align: center;
-      min-height: 64px;
-      word-break: break-all;
-    }
-    .piece-select-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-    .piece-select-card .status-sub { font-size: 13px; font-weight: normal; margin-top: 3px; opacity: 0.95; }
+        .upload-area:hover {
+            background: #e0e7ff;
+            border-color: #818cf8;
+        }
 
-    .piece-select-card.Red { background-color: var(--red-bg); border: 2px solid var(--red); color: var(--red); }
-    .piece-select-card.Blue { background-color: var(--blue-bg); border: 2px solid var(--blue); color: var(--blue); }
-    .piece-select-card.Green { background-color: var(--green-bg); border: 2px solid var(--green); color: var(--green); }
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
 
-    .piece-select-card.selected {
-      background-color: #f39c12 !important;
-      color: #fff !important;
-      border-color: #d35400 !important;
-      transform: scale(1.04);
-      box-shadow: 0 0 10px rgba(211, 84, 0, 0.5);
-    }
-    .piece-select-card.finished {
-      background-color: #e0e0e0 !important;
-      border-color: #a0a0a0 !important;
-      color: #777 !important;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
+        .color-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-    .yut-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-    .yut-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #fff;
-      border: 1px solid #b89b7d;
-      border-radius: 8px;
-      padding: 10px 4px;
-      cursor: pointer;
-      font-size: 18px;
-    }
-    .yut-btn:hover { background: #fdf6e3; }
-    .yut-icon { display: flex; gap: 3px; margin-bottom: 4px; }
-    .stick { width: 7px; height: 26px; background: #8c531b; border-radius: 3px; }
-    .stick.flat { background: #f39c12; border: 1px solid #8c531b; }
-    .stick.backdo { background: #c0392b; }
+        .color-dot:hover, .color-dot.active {
+            transform: scale(1.15);
+            box-shadow: 0 0 0 3px #4f46e5;
+        }
 
-    /* 말 디자인 */
-    .piece {
-      padding: 6px 11px;
-      border-radius: 16px;
-      color: white;
-      font-size: 14px;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 2px solid white;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-      position: absolute;
-      transition: left 0.45s ease-in-out, top 0.45s ease-in-out, transform 0.2s;
-      cursor: pointer;
-      z-index: 10;
-      white-space: nowrap;
-    }
-    .piece.Red { background-color: var(--red); }
-    .piece.Blue { background-color: var(--blue); }
-    .piece.Green { background-color: var(--green); }
-    .piece.selected { transform: translate(-50%, -50%) scale(1.18) !important; box-shadow: 0 0 12px #000; z-index: 20; border-color: #ffeaa7; }
+        .canvas-area-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-    .action-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-    .action-row { display: flex; gap: 8px; }
-    .action-btns button { flex: 1; padding: 12px 6px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 8px; border: 1px solid #b89b7d; background: #fff; }
-    .action-btns button:hover { background: #f0e4d4; }
-    .btn-undo { background: #e74c3c !important; color: white !important; border: none !important; }
-    .btn-undo:disabled { background: #e0a8a1 !important; cursor: not-allowed; }
+        .canvas-wrapper {
+            background: white;
+            border-radius: 20px;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
 
-    /* 모달 */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 200;
-    }
-    .modal-box {
-      background: #fffdf9;
-      padding: 35px;
-      border-radius: 18px;
-      border: 5px solid #8c531b;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-      text-align: center;
-      width: 90%;
-      max-width: 580px;
-      box-sizing: border-box;
-    }
+        #mainCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            touch-action: none;
+            cursor: crosshair;
+        }
 
-    .group-select-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin: 20px 0;
-      text-align: left;
-    }
-    .group-select-item {
-      background: #f4ece1;
-      padding: 14px 18px;
-      border-radius: 10px;
-      border: 1px solid #d4c0a8;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .group-select-item input { width: 24px; height: 24px; cursor: pointer; }
+        .placeholder-icon {
+            font-size: 60px;
+            color: #c7d2fe;
+            text-align: center;
+        }
 
-    .alert-title { font-size: 34px; font-weight: bold; color: #d35400; margin-bottom: 15px; }
-    .alert-message { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 25px; word-break: keep-all; line-height: 1.4; }
-    .btn-alert-confirm { background: #d35400; color: #fff; border: none; padding: 14px 45px; font-size: 24px; font-weight: bold; border-radius: 10px; cursor: pointer; }
+        /* 팝업 모달 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+        }
 
-    .celebration-header { font-size: 36px; font-weight: bold; color: #d35400; margin-bottom: 10px; }
-    .result-board { margin: 20px 0; background: #f4ece1; border: 2px solid #8c531b; border-radius: 12px; padding: 18px; text-align: left; }
-    .result-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 8px; border-bottom: 2px dashed #d4c0a8; font-size: 19px; }
-    .result-row:last-child { border-bottom: none; }
-    .result-row-top { display: flex; justify-content: space-between; align-items: center; }
-    .rank-badge { font-weight: bold; padding: 5px 14px; border-radius: 14px; color: white; font-size: 18px; }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    .modal-btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-    .modal-btn-group button { padding: 12px 22px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1px solid #8c531b; }
-    .btn-modal-primary { background: #8c531b; color: white; border: none !important; }
-    .btn-modal-secondary { background: #fff; color: #333; }
-    .btn-modal-resume { background: #27ae60; color: white; border: none !important; }
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
 
-    .draw-cards-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
-    .draw-card {
-      width: 95px; height: 130px;
-      background: linear-gradient(135deg, #8c531b, #5a3d28);
-      border: 3px solid #f39c12; border-radius: 10px;
-      color: #fff; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      font-size: 32px; font-weight: bold; cursor: pointer;
-      transition: transform 0.3s, background 0.3s;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-    }
-    .draw-card:hover { transform: translateY(-8px); }
-    .draw-card.flipped { background: #fffdf9; color: #8c531b; border-color: #8c531b; font-size: 22px; }
+        .modal h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
 
-    .draw-result-container { margin-top: 20px; padding: 15px; background: #fff5e6; border: 2px dashed #d35400; border-radius: 12px; word-break: keep-all; }
-    .draw-result-main { font-size: 26px; font-weight: bold; color: #d35400; margin-bottom: 8px; line-height: 1.4; }
-    .draw-result-sub { font-size: 22px; font-weight: bold; color: #4a2c11; }
-  </style>
+        .modal input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            outline: none;
+            text-align: left;
+        }
+
+        .modal input[type="text"]:focus {
+            border-color: #4f46e5;
+        }
+
+        .modal-btns {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 상단 탐지 결과 상자 */
+        .summary-box {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .loading-spinner {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #c7d2fe;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 
-<div class="card">
-  <!-- 시작 화면 -->
-  <div id="start-screen">
-    <h1>전통 윷놀이</h1>
-    <p style="text-align:center; font-size: 22px; color: #5a3d28;">팀별 말을 설정하고 게임을 시작하세요.</p>
-    
-    <div class="form-group">
-      <label for="team-count">참여 팀 수:</label>
-      <select id="team-count" onchange="renderTeamConfig()">
-        <option value="1">1팀 (연습용)</option>
-        <option value="2" selected>2팀 (빨강, 파랑)</option>
-        <option value="3">3팀 (빨강, 파랑, 초록)</option>
-      </select>
-    </div>
+<div class="container">
+    <header>
+        <div class="logo-title">
+            <div class="logo-icon">▲</div>
+            <div class="title-text">
+                <h1>알록달록 도형 탐험대</h1>
+                <p>사진 속에서 여러가지 도형을 찾아보고 색칠해요</p>
+            </div>
+        </div>
+        <button class="btn btn-outline" id="openApiModalBtn">🔑 API 키 설정</button>
+    </header>
 
-    <div class="form-group">
-      <label for="piece-count">팀별 말 개수:</label>
-      <input type="number" id="piece-count" min="1" max="4" value="4" onchange="renderTeamConfig()">
-    </div>
+    <div class="main-grid">
+        <!-- 컨트롤 패널 -->
+        <div class="controls">
+            <div class="card">
+                <div class="card-title">
+                    <span class="step-badge">1</span> 사진 올리기
+                </div>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <p style="font-size: 30px; margin-bottom: 5px;">📷</p>
+                    <p style="font-weight: bold; color: #4338ca;">사진 선택하기</p>
+                    <p style="font-size: 12px; color: #888; margin-top: 4px;">도형이 들어있는 사진을 클릭하세요</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <button class="btn" id="detectBtn" style="width: 100%; margin-top: 15px;" disabled>✨ 도형 찾기 시작!</button>
+            </div>
 
-    <div class="form-group">
-      <label>팀별 말 이름 지정 (입력된 순서대로 던지기에 참여합니다):</label>
-      <div id="team-config-container" class="piece-config-grid"></div>
-    </div>
+            <div class="card">
+                <div class="card-title">
+                    <span class="step-badge">2</span> 색상 및 도구
+                </div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">색상 선택</p>
+                <div class="color-palette" id="palette">
+                    <div class="color-dot active" style="background: #f87171;" data-color="#f87171"></div>
+                    <div class="color-dot" style="background: #fb923c;" data-color="#fb923c"></div>
+                    <div class="color-dot" style="background: #facc15;" data-color="#facc15"></div>
+                    <div class="color-dot" style="background: #34d399;" data-color="#34d399"></div>
+                    <div class="color-dot" style="background: #38bdf8;" data-color="#38bdf8"></div>
+                    <div class="color-dot" style="background: #818cf8;" data-color="#818cf8"></div>
+                    <div class="color-dot" style="background: #f472b6;" data-color="#f472b6"></div>
+                    <div class="color-dot" style="background: #b45309;" data-color="#b45309"></div>
+                    <div class="color-dot" style="background: #475569;" data-color="#475569"></div>
+                    <div class="color-dot" style="background: #000000;" data-color="#000000"></div>
+                </div>
 
-    <div class="form-group">
-      <label style="cursor: pointer;">
-        <input type="checkbox" id="capture-opt" checked style="width: 22px; height: 22px; vertical-align: middle;"> 상대 말 잡기 기능 사용
-      </label>
-    </div>
+                <div style="margin-top: 15px;">
+                    <p style="font-size: 12px; color: #666; margin-bottom: 5px;">브러시 크기</p>
+                    <input type="range" id="brushSize" min="10" max="60" value="30" style="width: 100%;">
+                </div>
 
-    <button type="button" class="btn-primary" onclick="startRandomOrderGame()">순서를 정하는 제비뽑기</button>
-  </div>
-
-  <!-- 게임 화면 -->
-  <div id="game-screen">
-    <div class="game-header">
-      <h2>전통 윷놀이</h2>
-      <div class="header-btns">
-        <button type="button" class="btn-stop" onclick="stopGameManual()">⏹️ 경기 중도 종료</button>
-        <button type="button" onclick="resetGame()">새 게임</button>
-        <button type="button" onclick="goHome()">시작화면</button>
-      </div>
-    </div>
-
-    <div class="main-layout">
-      <div class="left-section">
-        <div class="left-panel">
-          <svg id="board-svg"></svg>
-          <div id="board-container"></div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline" id="eraserBtn" style="flex: 1;">🧹 지우개</button>
+                    </div>
+                    <button class="btn btn-outline" id="resetBtn" style="width: 100%; color: #dc2626;" disabled>🔄 다시하기</button>
+                </div>
+            </div>
         </div>
 
-        <div class="waiting-area">
-          <div class="waiting-title">말 대기 공간:</div>
-          <div id="waiting-pieces-box" class="waiting-pieces-box"></div>
-        </div>
+        <!-- 캔버스 영역 및 상단 탐지 결과 -->
+        <div class="canvas-area-container">
+            <div class="summary-box" id="resultSummary" style="display: none;">
+                <p style="font-weight: bold; margin-bottom: 4px;">📊 탐지 결과</p>
+                <div id="summaryContent" style="font-size: 14px; line-height: 1.4;"></div>
+            </div>
 
-        <div class="finish-board">
-          <h3>🎉 완주 현황판 🎉</h3>
-          <div id="finish-status" class="finish-status-items"></div>
-        </div>
-      </div>
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <div class="placeholder-icon" id="placeholder">🖼️</div>
+                <canvas id="mainCanvas" style="display: none;"></canvas>
 
-      <div class="right-panel">
-        <div id="turn-display" class="turn-indicator turn-Red">
-          <div>빨강 팀 순서</div>
-          <div id="current-thrower-text" class="current-thrower-box">던질 주자: 빨강1</div>
+                <div class="loading-spinner" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p id="loadingText">도형을 찾는 중.</p>
+                </div>
+            </div>
         </div>
-        
-        <h3>1. 이동할 말 선택</h3>
-        <div id="piece-list" class="piece-list"></div>
-
-        <h3>2. 윷 던지기 선택</h3>
-        <div class="yut-selector">
-          <div class="yut-btn" onclick="selectYut('도')">
-            <div class="yut-icon"><div class="stick flat"></div><div class="stick"></div><div class="stick"></div><div class="stick"></div></div>
-            <b>도</b><small>1칸</small>
-          </div>
-          <div class="yut-btn" onclick="selectYut('개')">
-            <div class="yut-icon"><div class="stick flat"></div><div class="stick flat"></div><div class="stick"></div><div class="stick"></div></div>
-            <b>개</b><small>2칸</small>
-          </div>
-          <div class="yut-btn" onclick="selectYut('걸')">
-            <div class="yut-icon"><div class="stick flat"></div><div class="stick flat"></div><div class="stick flat"></div><div class="stick"></div></div>
-            <b>걸</b><small>3칸</small>
-          </div>
-          <div class="yut-btn" onclick="selectYut('모')">
-            <div class="yut-icon"><div class="stick"></div><div class="stick"></div><div class="stick"></div><div class="stick"></div></div>
-            <b>모</b><small>5칸(+1)</small>
-          </div>
-          <div class="yut-btn" onclick="selectYut('윷')">
-            <div class="yut-icon"><div class="stick flat"></div><div class="stick flat"></div><div class="stick flat"></div><div class="stick flat"></div></div>
-            <b>윷</b><small>4칸(+1)</small>
-          </div>
-          <div class="yut-btn" onclick="selectYut('백도')">
-            <div class="yut-icon"><div class="stick backdo"></div><div class="stick"></div><div class="stick"></div><div class="stick"></div></div>
-            <b>백도</b><small>-1칸</small>
-          </div>
-        </div>
-
-        <div class="action-btns">
-          <div class="action-row">
-            <button type="button" onclick="openGroupSelectModal()">같은 칸 말 업기</button>
-            <button type="button" onclick="openUngroupSelectModal()">말 업기 해제</button>
-          </div>
-          <button type="button" id="undo-btn" class="btn-undo" onclick="undoLastMove()" disabled>↩️ 방금 실행 되돌리기</button>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
-<!-- 순서 정하기 모달 -->
-<div id="random-order-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h2 style="color:#8c531b; font-size:32px;">🎴 순서를 정하는 제비뽑기</h2>
-    <p id="draw-instruction" style="font-size:20px; color:#5a3d28;">원하는 카드를 하나 선택해 주세요!</p>
-    <div id="draw-cards" class="draw-cards-container"></div>
-    
-    <div id="draw-result-box" class="draw-result-container" style="display:none;">
-      <div id="draw-result-main" class="draw-result-main"></div>
-      <div id="draw-result-sub" class="draw-result-sub"></div>
+<!-- API 키 입력 모달 -->
+<div class="modal-overlay" id="apiModal">
+    <div class="modal">
+        <h2>🔑 Google AI Studio API 키 입력</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">발급받으신 Gemini API 키를 입력해 주세요.</p>
+        <input type="text" id="apiKeyInput" placeholder="AIzaSy...">
+        <div class="modal-btns">
+            <button class="btn btn-outline" onclick="closeModal()">취소</button>
+            <button class="btn" onclick="saveApiKey()">저장하기</button>
+        </div>
     </div>
-
-    <button type="button" id="start-main-game-btn" class="btn-primary" style="display:none; margin-top:20px;" onclick="confirmOrderAndStart()">윷놀이 시작하기!</button>
-  </div>
 </div>
 
-<!-- 말 업기 선택 모달 -->
-<div id="group-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 style="color:#8c531b; margin-top:0; font-size:26px;">🤝 함께 업을 말 선택</h3>
-    <p id="group-modal-desc" style="font-size:18px; color:#666;">함께 업을 말을 체크박스로 선택해 주세요.</p>
-    <div id="group-select-list" class="group-select-list"></div>
-    <div class="action-row">
-      <button type="button" class="btn-primary" style="margin:0; padding:14px 28px; font-size:20px;" onclick="confirmGrouping()">선택 말 업기</button>
-      <button type="button" style="padding:14px 28px; font-size:20px; border-radius:8px; border:1px solid #ccc; cursor:pointer;" onclick="closeModal('group-modal')">취소</button>
+<!-- 성공 축하 모달 (모든 도형 색칠 완료 시) -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal" style="background: linear-gradient(135deg, #ffffff, #f0f3ff);">
+        <p style="font-size: 60px; margin-bottom: 10px;">🎉</p>
+        <h2 style="font-size: 24px; color: #4f46e5; margin-bottom: 10px;">잘했어요! 👍</h2>
+        <p style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 20px;">도형을 전부 다 색칠했어요.</p>
+        <div class="modal-btns">
+            <button class="btn" onclick="closeSuccessModal()">멋져요!</button>
+        </div>
     </div>
-  </div>
-</div>
-
-<!-- 업기 해제 선택 모달 -->
-<div id="ungroup-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 style="color:#c0392b; margin-top:0; font-size:26px;">🔓 업기 해제할 말 선택</h3>
-    <p style="font-size:18px; color:#666;">업기에서 제외할(떼어낼) 말을 선택해 주세요.</p>
-    <div id="ungroup-select-list" class="group-select-list"></div>
-    <div class="action-row">
-      <button type="button" class="btn-primary" style="margin:0; padding:14px 28px; font-size:20px; background:#c0392b;" onclick="confirmUngrouping()">선택 말 떼어내기</button>
-      <button type="button" style="padding:14px 28px; font-size:20px; border-radius:8px; border:1px solid #ccc; cursor:pointer;" onclick="closeModal('ungroup-modal')">취소</button>
-    </div>
-  </div>
-</div>
-
-<!-- 알림 모달 -->
-<div id="alert-modal" class="modal-overlay">
-  <div class="modal-box">
-    <div id="alert-title" class="alert-title">🎉 '모' 나왔다!!! 👏</div>
-    <div id="alert-message" class="alert-message">한번 더 던져보세요!</div>
-    <button type="button" id="alert-confirm-btn" class="btn-alert-confirm" onclick="closeCustomAlert()">확 인</button>
-  </div>
-</div>
-
-<!-- 승리 및 경기 결과 모달 -->
-<div id="victory-modal" class="modal-overlay">
-  <div class="modal-box" style="max-width: 680px;">
-    <div id="celebration-header-text" class="celebration-header">🎊 경기 결과 분석 🎊</div>
-    <h2 id="victory-title" style="margin: 15px 0; color: #8c531b; font-size:30px;"></h2>
-    <p id="victory-subtext" style="margin-bottom: 20px; font-weight: bold; color: #5a3d28; font-size: 20px;"></p>
-
-    <div class="result-board">
-      <h3 style="margin: 0 0 15px 0; text-align: center; color: #4a2c11; font-size: 24px;">📊 경기 분석 결과</h3>
-      <div id="result-details-container"></div>
-    </div>
-
-    <div class="modal-btn-group">
-      <button type="button" id="btn-resume-game" class="btn-modal-resume" onclick="resumeGameFromModal()" style="display:none;">▶️ 이어서 플레이</button>
-      <button type="button" class="btn-modal-primary" onclick="resetGameFromModal()">🔄 새 게임 시작</button>
-      <button type="button" class="btn-modal-secondary" onclick="goHomeFromModal()">🏠 시작 화면으로</button>
-    </div>
-  </div>
 </div>
 
 <script>
-  function playSoundEffect(type) {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      const audioCtx = new AudioCtx();
-      const now = audioCtx.currentTime;
-
-      // 모/윷 또는 완주 시: 짧은 축하 멜로디 + 박수 느낌의 리듬
-      if (type === 'celebrate') {
-        const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
-        notes.forEach((freq, i) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, now + i * 0.12);
-          gain.gain.setValueAtTime(0.0001, now + i * 0.12);
-          gain.gain.exponentialRampToValueAtTime(0.22, now + i * 0.12 + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 0.11);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now + i * 0.12);
-          osc.stop(now + i * 0.12 + 0.12);
-        });
-
-        // 박수처럼 들리는 짧은 노이즈 효과
-        for (let i = 0; i < 5; i++) {
-          const bufferSize = audioCtx.sampleRate * 0.07;
-          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let j = 0; j < bufferSize; j++) data[j] = (Math.random() * 2 - 1) * (1 - j / bufferSize);
-          const source = audioCtx.createBufferSource();
-          const filter = audioCtx.createBiquadFilter();
-          const gain = audioCtx.createGain();
-          source.buffer = buffer;
-          filter.type = 'highpass';
-          filter.frequency.value = 1200;
-          gain.gain.value = 0.16;
-          source.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.destination);
-          const t = now + 0.35 + i * 0.18;
-          source.start(t);
-          source.stop(t + 0.07);
-        }
-        return;
-      }
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      gain.gain.setValueAtTime(2.0, now);
-
-      if (type === 'yut') {
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-      } else if (type === 'catch') {
-        osc.frequency.setValueAtTime(800, now);
-        osc.frequency.exponentialRampToValueAtTime(200, now + 0.2);
-      }
-
-      osc.start();
-      osc.stop(now + 0.2);
-    } catch(e) {}
-  }
-
-  const TEAM_COLORS = ['Red', 'Blue', 'Green'];
-  const TEAM_NAMES = { 'Red': '빨강', 'Blue': '파랑', 'Green': '초록' };
-
-  let config = { teamCount: 2, pieceCount: 4, allowCapture: true };
-
-  let gameState = {
-    turnOrder: [0, 1],
-    currentTurnIndex: 0,
-    currentTeamIdx: 0,
-    teamPieceTurnIndices: { 'Red': 0, 'Blue': 0, 'Green': 0 },
-    pieces: [],
-    selectedPieceId: null,
-    selectedYut: null,
-    bonusTurn: false,
-    isAnimating: false,
-    startTime: null
-  };
-
-  let historyStack = [];
-  let alertResolve = null;
-
-  const nodePositions = {
-    0:  { x: 0, y: 0 },
-    1:  { x: 550, y: 450, label: "1" }, 2: { x: 550, y: 350, label: "2" }, 3: { x: 550, y: 250, label: "3" }, 4: { x: 550, y: 150, label: "4" },
-    5:  { x: 550, y: 50, isSpecial: true, label: "지름길" },
-    6:  { x: 450, y: 50, label: "6" },  7: { x: 350, y: 50, label: "7" },  8: { x: 250, y: 50, label: "8" },  9: { x: 150, y: 50, label: "9" },
-    10: { x: 50, y: 50, isSpecial: true, label: "지름길" },
-    11: { x: 50, y: 150, label: "11" }, 12: { x: 50, y: 250, label: "12" }, 13: { x: 50, y: 350, label: "13" }, 14: { x: 50, y: 450, label: "14" },
-    15: { x: 50, y: 550, label: "15" },
-    16: { x: 150, y: 550, label: "16" }, 17: { x: 250, y: 550, label: "17" }, 18: { x: 350, y: 550, label: "18" }, 19: { x: 450, y: 550, label: "19" },
-    20: { x: 550, y: 550, isSpecial: true, label: "출발/도착" },
-
-    21: { x: 467, y: 133, label: "21" }, 22: { x: 384, y: 216, label: "22" },
-    23: { x: 300, y: 300, isSpecial: true, label: "지름길" },
-    24: { x: 216, y: 384, label: "24" }, 25: { x: 133, y: 467, label: "25" },
-
-    26: { x: 133, y: 133, label: "26" }, 27: { x: 216, y: 216, label: "27" },
-    28: { x: 384, y: 384, label: "28" }, 29: { x: 467, y: 467, label: "29" }
-  };
-
-  const boardLines = [
-    [20,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],
-    [10,11],[11,12],[12,13],[13,14],[14,15],[15,16],[16,17],[17,18],[18,19],[19,20],
-    [5,21],[21,22],[22,23],[23,24],[24,25],[25,15],
-    [10,26],[26,27],[27,23],[23,28],[28,29],[29,20]
-  ];
-
-  function showCustomAlert(title, message) {
-    return new Promise((resolve) => {
-      alertResolve = resolve;
-      document.getElementById('alert-title').innerText = title;
-      document.getElementById('alert-message').innerText = message;
-      document.getElementById('alert-modal').style.display = 'flex';
-    });
-  }
-
-  function closeCustomAlert() {
-    document.getElementById('alert-modal').style.display = 'none';
-    if (alertResolve) {
-      alertResolve();
-      alertResolve = null;
-    }
-  }
-
-  function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-  }
-
-  function renderTeamConfig() {
-    const tCount = parseInt(document.getElementById('team-count').value);
-    const pCount = parseInt(document.getElementById('piece-count').value);
-    const container = document.getElementById('team-config-container');
-    container.innerHTML = '';
-
-    for (let t = 0; t < tCount; t++) {
-      const teamColor = TEAM_COLORS[t];
-      const card = document.createElement('div');
-      card.className = 'team-config-card';
-      
-      let rowsHtml = '';
-      for (let p = 1; p <= pCount; p++) {
-        rowsHtml += `
-          <div class="piece-input-row">
-            <span>${p}번 주자:</span>
-            <input type="text" id="name-${teamColor}-${p}" value="${TEAM_NAMES[teamColor]}${p}">
-          </div>
-        `;
-      }
-      card.innerHTML = `<h4 style="margin:0 0 8px 0; font-size:20px; color:${teamColor.toLowerCase()}">${TEAM_NAMES[teamColor]} 팀 던지기 순서</h4>${rowsHtml}`;
-      container.appendChild(card);
-    }
-  }
-
-  window.onload = renderTeamConfig;
-
-  let drawCardValues = [];
-
-  function startRandomOrderGame() {
-    config.teamCount = parseInt(document.getElementById('team-count').value);
-    config.pieceCount = parseInt(document.getElementById('piece-count').value);
-    config.allowCapture = document.getElementById('capture-opt').checked;
-
-    const cardsContainer = document.getElementById('draw-cards');
-    const resultBox = document.getElementById('draw-result-box');
-    const startBtn = document.getElementById('start-main-game-btn');
-
-    cardsContainer.innerHTML = '';
-    resultBox.style.display = 'none';
-    startBtn.style.display = 'none';
-
-    const orderOptions = [];
-    for (let i = 0; i < config.teamCount; i++) orderOptions.push(i);
-    drawCardValues = orderOptions.sort(() => Math.random() - 0.5);
-
-    for (let i = 0; i < config.teamCount; i++) {
-      const card = document.createElement('div');
-      card.className = 'draw-card';
-      card.innerText = '❓';
-      card.onclick = () => revealCard(i, card);
-      cardsContainer.appendChild(card);
-    }
-
-    document.getElementById('random-order-modal').style.display = 'flex';
-  }
-
-  function revealCard(selectedIndex, cardEl) {
-    if (cardEl.classList.contains('flipped')) return;
-
-    const resultOrder = [];
-    const firstTeamIdx = drawCardValues[selectedIndex];
-    resultOrder.push(firstTeamIdx);
-
-    for (let i = 0; i < config.teamCount; i++) {
-      if (i !== firstTeamIdx) resultOrder.push(i);
-    }
-
-    gameState.turnOrder = resultOrder;
-    gameState.currentTurnIndex = 0;
-    gameState.currentTeamIdx = resultOrder[0];
-
-    const allCards = document.querySelectorAll('.draw-card');
-    allCards.forEach((c, idx) => {
-      c.classList.add('flipped');
-      const teamIdxOfCard = drawCardValues[idx];
-      c.innerText = TEAM_NAMES[TEAM_COLORS[teamIdxOfCard]];
-      c.style.color = TEAM_COLORS[teamIdxOfCard].toLowerCase();
-    });
-
-    const leadTeamName = TEAM_NAMES[TEAM_COLORS[firstTeamIdx]];
-    const resultBox = document.getElementById('draw-result-box');
-    
-    document.getElementById('draw-result-main').innerHTML = `🎊 제비뽑기 결과,<br>${leadTeamName} 팀이 첫번째 입니다.`;
-    document.getElementById('draw-result-sub').innerText = `${leadTeamName}팀부터 윷놀이를 시작해 주세요!`;
-    resultBox.style.display = 'block';
-
-    document.getElementById('start-main-game-btn').style.display = 'inline-block';
-  }
-
-  function confirmOrderAndStart() {
-    closeModal('random-order-modal');
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'flex';
-
-    initBoardUI();
-    resetGameState(false);
-  }
-
-  function saveHistory() {
-    historyStack.push(JSON.parse(JSON.stringify(gameState)));
-    document.getElementById('undo-btn').disabled = false;
-  }
-
-  function undoLastMove() {
-    if (historyStack.length === 0) return;
-    gameState = historyStack.pop();
-    if (historyStack.length === 0) {
-      document.getElementById('undo-btn').disabled = true;
-    }
-    updateUI();
-    showCustomAlert("↩️ 되돌리기 완료", "이전 실행 상태로 되돌렸습니다.");
-  }
-
-  function getNextNode(current, isFirstStepFromCorner = false, remainingSteps = 1, previousPos = null) {
-    // 모서리에서 출발할 때는 지름길로 진입
-    if (isFirstStepFromCorner) {
-      if (current === 5) return 21;
-      if (current === 10) return 26;
-      if (current === 23) return 28;
-    }
-
-    if (current === 0) return 1;
-    if (current === 20) return 99;
-
-    // 5번 지름길: 21 → 22 → 23 → 24 → 25 → 15
-    if (current === 22) return 23;
-    if (current === 25) return 15;
-
-    // ★ 27번에서 이동할 때는 실제로 23번을 반드시 거침 ★
-    // 도(1칸): 27 → 23
-    // 개(2칸): 27 → 23 → 28
-    // 걸(3칸): 27 → 23 → 28 → 29
-    // 윷/모: 27 → 23 → 28 → 29 → 20 → 도착
-    if (current === 27) {
-      return 23;
-    }
-
-    // 27번에서 23번으로 들어온 경우에는 다음 칸을 28번으로 연결
-    if (current === 23 && previousPos === 27) {
-      return 28;
-    }
-
-    // 28 → 29 → 20(도착)
-    if (current === 28) return 29;
-    if (current === 29) return 20;
-
-    return current + 1;
-  }
-
-  function getPrevNode(current) {
-    if (current <= 1) return 0;
-    if (current === 21) return 5;
-    if (current === 26) return 10;
-    if (current === 24) return 23;
-    if (current === 28) return 23;
-    if (current === 23) return 22;
-    if (current === 15) return 25;
-    if (current === 20) return 29;
-    return current - 1;
-  }
-
-  function initBoardUI() {
-    const container = document.getElementById('board-container');
-    const svg = document.getElementById('board-svg');
-    container.innerHTML = '';
-
-    let svgLines = '';
-    boardLines.forEach(([start, end]) => {
-      const p1 = nodePositions[start];
-      const p2 = nodePositions[end];
-      svgLines += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#8c531b" stroke-width="4" stroke-linecap="round"/>`;
-    });
-    svg.innerHTML = svgLines;
-
-    Object.keys(nodePositions).forEach(idx => {
-      if (idx == 0) return;
-      const pos = nodePositions[idx];
-      const node = document.createElement('div');
-      node.className = `board-node ${pos.isSpecial ? 'special-node' : ''}`;
-      node.style.left = pos.x + 'px';
-      node.style.top = pos.y + 'px';
-      node.innerText = pos.label || idx;
-      container.appendChild(node);
-    });
-  }
-
-  function resetGameState(fullReset = true) {
-    gameState.pieces = [];
-    gameState.selectedPieceId = null;
-    gameState.selectedYut = null;
-    gameState.bonusTurn = false;
-    gameState.isAnimating = false;
-    gameState.startTime = new Date();
-
-    if (fullReset) {
-      gameState.turnOrder = [];
-      for (let i = 0; i < config.teamCount; i++) gameState.turnOrder.push(i);
-      gameState.currentTurnIndex = 0;
-      gameState.currentTeamIdx = 0;
-    }
-
-    let globalId = 0;
-    for (let t = 0; t < config.teamCount; t++) {
-      const color = TEAM_COLORS[t];
-      gameState.teamPieceTurnIndices[color] = 0;
-
-      for (let p = 1; p <= config.pieceCount; p++) {
-        const inputName = document.getElementById(`name-${color}-${p}`);
-        const customName = (inputName && inputName.value.trim() !== '') ? inputName.value.trim() : `${TEAM_NAMES[color]}${p}`;
-
-        gameState.pieces.push({
-          id: globalId++,
-          team: color,
-          num: p,
-          name: customName,
-          pos: 0,
-          status: 'waiting',
-          group: []
-        });
-      }
-    }
-
-    historyStack = [];
-    document.getElementById('undo-btn').disabled = true;
-    updateUI();
-  }
-
-  function getFullPieceName(piece) {
-    let names = [piece.name];
-    if (piece.group && piece.group.length > 0) {
-      piece.group.forEach(gId => {
-        const gPiece = gameState.pieces.find(x => x.id === gId);
-        if (gPiece) names.push(gPiece.name);
-      });
-    }
-    return names.join('+');
-  }
-
-  function updateUI() {
-    updateBoardPieces();
-    updateWaitingArea();
-    updateFinishBoard();
-    updateControlPanel();
-  }
-
-  function updateBoardPieces() {
-    const container = document.getElementById('board-container');
-    const existingPieces = container.querySelectorAll('.piece');
-    existingPieces.forEach(el => el.remove());
-
-    const nodeGroups = {};
-    gameState.pieces.forEach(p => {
-      const isRider = gameState.pieces.some(parent => parent.group && parent.group.includes(p.id));
-      if (!isRider && p.status === 'active' && p.pos > 0 && p.pos <= 29) {
-        if (!nodeGroups[p.pos]) nodeGroups[p.pos] = [];
-        nodeGroups[p.pos].push(p);
-      }
-    });
-
-    Object.keys(nodeGroups).forEach(nodeIdx => {
-      const piecesOnNode = nodeGroups[nodeIdx];
-      const pos = nodePositions[nodeIdx];
-
-      piecesOnNode.forEach((p, index) => {
-        const el = document.createElement('div');
-        let classes = `piece ${p.team}`;
-        if (p.id === gameState.selectedPieceId) classes += ' selected';
-        el.className = classes;
-
-        el.innerText = getFullPieceName(p);
-
-        let offsetX = (index - (piecesOnNode.length - 1) / 2) * 16;
-        let offsetY = (index - (piecesOnNode.length - 1) / 2) * 16;
-
-        el.style.left = (pos.x + offsetX) + 'px';
-        el.style.top = (pos.y + offsetY) + 'px';
-        el.style.transform = 'translate(-50%, -50%)';
-
-        el.onclick = (e) => {
-          e.stopPropagation();
-          selectPiece(p.id);
-        };
-
-        container.appendChild(el);
-      });
-    });
-  }
-
-  function updateWaitingArea() {
-    const box = document.getElementById('waiting-pieces-box');
-    box.innerHTML = '';
-
-    const waitingPieces = gameState.pieces.filter(p => p.status === 'waiting');
-    waitingPieces.forEach(p => {
-      const tag = document.createElement('div');
-      tag.className = `finish-tag ${p.team}`;
-      tag.innerText = p.name;
-      tag.style.cursor = 'pointer';
-      tag.style.fontSize = '16px';
-      tag.style.padding = '6px 12px';
-
-      if (p.id === gameState.selectedPieceId) {
-        tag.style.outline = '3px solid #d35400';
-        tag.style.transform = 'scale(1.08)';
-      }
-
-      tag.onclick = () => selectPiece(p.id);
-      box.appendChild(tag);
-    });
-  }
-
-  function updateFinishBoard() {
-    const finishContainer = document.getElementById('finish-status');
-    finishContainer.innerHTML = '';
-
-    for (let t = 0; t < config.teamCount; t++) {
-      const color = TEAM_COLORS[t];
-      const finished = gameState.pieces.filter(p => p.team === color && p.status === 'finished');
-
-      const item = document.createElement('div');
-      item.className = 'finish-item';
-
-      let tagsHtml = finished.map(p => `<span class="finish-tag ${color}">${p.name}</span>`).join('');
-      if (finished.length === 0) tagsHtml = '<span style="color:#aaa; font-weight:normal;">없음</span>';
-
-      item.innerHTML = `
-        <span style="color:${color.toLowerCase()}">${TEAM_NAMES[color]}팀 (${finished.length}/${config.pieceCount})</span>
-        <div class="finish-pieces-tags">${tagsHtml}</div>
-      `;
-      finishContainer.appendChild(item);
-    }
-  }
-
-  function updateControlPanel() {
-    const currentTeamColor = TEAM_COLORS[gameState.currentTeamIdx];
-    const turnDisplay = document.getElementById('turn-display');
-    
-    turnDisplay.className = `turn-indicator turn-${currentTeamColor}`;
-    turnDisplay.children[0].innerText = `${TEAM_NAMES[currentTeamColor]} 팀 순서`;
-
-    const teamPieces = gameState.pieces.filter(p => p.team === currentTeamColor);
-    const turnIdx = gameState.teamPieceTurnIndices[currentTeamColor] % teamPieces.length;
-    const currentThrowerPiece = teamPieces[turnIdx];
-
-    document.getElementById('current-thrower-text').innerText = `던질 주자: ${currentThrowerPiece ? currentThrowerPiece.name : ''}`;
-
-    const pieceList = document.getElementById('piece-list');
-    pieceList.innerHTML = '';
-
-    teamPieces.forEach(p => {
-      const isRider = gameState.pieces.some(parent => parent.group && parent.group.includes(p.id));
-      if (isRider) return;
-
-      const card = document.createElement('div');
-      let classes = `piece-select-card ${p.team}`;
-      if (p.id === gameState.selectedPieceId) classes += ' selected';
-      if (p.status === 'finished') classes += ' finished';
-
-      card.className = classes;
-
-      let statusText = '대기 중';
-      if (p.status === 'active') statusText = `${p.pos}번 칸`;
-      if (p.status === 'finished') statusText = '완주!';
-
-      card.innerHTML = `
-        <div>${getFullPieceName(p)}</div>
-        <div class="status-sub">${statusText}</div>
-      `;
-
-      if (p.status !== 'finished') {
-        card.onclick = () => selectPiece(p.id);
-      }
-      pieceList.appendChild(card);
-    });
-  }
-
-  function selectPiece(id) {
-    if (gameState.isAnimating) return;
-    const p = gameState.pieces.find(item => item.id === id);
-    if (!p) return;
-
-    const currentTeamColor = TEAM_COLORS[gameState.currentTeamIdx];
-    if (p.team !== currentTeamColor) {
-      showCustomAlert("⚠️ 선택 오류", "현재 턴인 팀의 말만 선택할 수 있습니다!");
-      return;
-    }
-
-    if (p.status === 'finished') return;
-
-    gameState.selectedPieceId = id;
-    updateUI();
-  }
-
-  async function selectYut(yutName) {
-    if (gameState.isAnimating) return;
-
-    if (gameState.selectedPieceId === null) {
-      showCustomAlert("⚠️ 말 미선택", "이동할 말을 먼저 선택해 주세요!");
-      return;
-    }
-
-    saveHistory();
-    playSoundEffect('yut');
-
-    gameState.selectedYut = yutName;
-    gameState.isAnimating = true;
-
-    // 던질 당시에 이미 보너스 턴 기회가 있는 상황이었는지 확인
-    const hadBonusChance = gameState.bonusTurn;
-    // 이번 투척으로 보너스 턴을 얻었는지 플래그 초기화
-    let earnedNewBonus = false;
-
-    const p = gameState.pieces.find(item => item.id === gameState.selectedPieceId);
-    let steps = 0;
-    if (yutName === '도') steps = 1;
-    if (yutName === '개') steps = 2;
-    if (yutName === '걸') steps = 3;
-    if (yutName === '윷') steps = 4;
-    if (yutName === '모') steps = 5;
-    if (yutName === '백도') steps = -1;
-
-    // 모, 윷인 경우 보너스 턴 획득
-    if (yutName === '모' || yutName === '윷') {
-      earnedNewBonus = true;
-    }
-
-    const captured = await movePieceSteps(p, steps);
-
-    // 말이 완주한 경우에는 모/윷 보너스 턴을 주지 않고
-    // 즉시 다음 팀으로 턴을 넘깁니다.
-    const hasFinished = p.status === 'finished';
-
-    if (captured && !hasFinished) {
-      earnedNewBonus = true;
-    }
-
-    if (hasFinished) {
-      earnedNewBonus = false;
-      gameState.bonusTurn = false;
-    }
-
-    gameState.isAnimating = false;
-
-    if (earnedNewBonus) {
-      gameState.bonusTurn = true;
-      if (yutName === '모' || yutName === '윷') {
-        playSoundEffect('celebrate');
-        await showCustomAlert(`🎉 '${yutName}' 나왔다!`, "한번 더 던지세요!");
-      }
-    } else {
-      // 새로운 보너스 획득이 없으면 (이전에 있던 보너스 기회도 소진) 다음 팀으로 턴 넘김
-      gameState.bonusTurn = false;
-      nextTurn();
-    }
-
-    gameState.selectedPieceId = null;
-    gameState.selectedYut = null;
-    updateUI();
-
-    checkGameEnd();
-  }
-
-  async function movePieceSteps(piece, steps) {
-    let capturedEnemy = false;
-    let current = piece.pos;
-
-    if (steps === -1) {
-      if (piece.status === 'waiting' || current === 0) {
-        await showCustomAlert("백도!", "대기 중인 말은 뒤로 갈 수 없습니다.");
-        return false;
-      }
-      piece.pos = getPrevNode(current);
-      if (piece.pos === 0) piece.status = 'waiting';
-      updateUI();
-      await new Promise(r => setTimeout(r, 400));
-    } else {
-      if (piece.status === 'waiting') {
-        piece.status = 'active';
-        piece.pos = 1;
-        steps--;
-        updateUI();
-        await new Promise(r => setTimeout(r, 350));
-      }
-
-      let isFirst = true;
-      let previousPos = null;
-      // 27번에서 출발한 경우에는 반드시 23 → 28 → 29 순서로 이동
-      // (일반 경로의 23 → 24 → 25와 절대 섞이지 않도록 별도 경로로 처리)
-      let from27 = (piece.pos === 27);
-      while (steps > 0) {
-        let currentPos = piece.pos;
-        let next;
-
-        if (from27) {
-          if (currentPos === 27) {
-            next = 23;
-          } else if (currentPos === 23) {
-            next = 28;
-          } else if (currentPos === 28) {
-            next = 29;
-          } else if (currentPos === 29) {
-            next = 20;
-          } else {
-            next = getNextNode(currentPos, isFirst, steps, previousPos);
-          }
-        } else {
-          next = getNextNode(currentPos, isFirst, steps, previousPos);
-        }
-
-        isFirst = false;
-
-        if (next === 99) {
-          piece.status = 'finished';
-          piece.pos = 99;
-
-          if (piece.group && piece.group.length > 0) {
-            piece.group.forEach(gId => {
-              const gPiece = gameState.pieces.find(x => x.id === gId);
-              if (gPiece) gPiece.status = 'finished';
+    let apiKey = localStorage.getItem('gemini_api_key') || '';
+    let currentImg = null;
+    let detectedShapes = [];
+    let currentColor = '#f87171';
+    let isEraser = false;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const fillCanvas = document.createElement('canvas');
+    const fillCtx = fillCanvas.getContext('2d', { willReadFrequently: true });
+
+    const apiModal = document.getElementById('apiModal');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const successModal = document.getElementById('successModal');
+
+    function playSuccessSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            
+            const notes = [261.63, 329.63, 392.00, 523.25];
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                
+                const startTime = audioCtx.currentTime + index * 0.1;
+                gain.gain.setValueAtTime(0.3, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(startTime);
+                osc.stop(startTime + 0.3);
             });
-          }
-
-          updateUI();
-          playSoundEffect('celebrate');
-          await showCustomAlert("🎊 완주 성공!", `${getFullPieceName(piece)} 말이 완주하였습니다!`);
-          break;
-        }
-
-        previousPos = currentPos;
-        piece.pos = next;
-        updateUI();
-        await new Promise(r => setTimeout(r, 350));
-        steps--;
-      }
+        } catch (e) {}
     }
 
-    if (piece.status === 'active' && piece.pos > 0 && piece.pos <= 29) {
-      if (config.allowCapture) {
-        const enemyPieces = gameState.pieces.filter(x => x.team !== piece.team && x.status === 'active' && x.pos === piece.pos);
-        if (enemyPieces.length > 0) {
-          playSoundEffect('catch');
-          enemyPieces.forEach(e => {
-            e.status = 'waiting';
-            e.pos = 0;
-            if (e.group) {
-              e.group.forEach(gId => {
-                const gPiece = gameState.pieces.find(x => x.id === gId);
-                if (gPiece) { gPiece.status = 'waiting'; gPiece.pos = 0; }
-              });
-              e.group = [];
+    document.getElementById('openApiModalBtn').addEventListener('click', () => {
+        apiKeyInput.value = apiKey;
+        apiModal.classList.add('active');
+    });
+
+    function closeModal() {
+        apiModal.classList.remove('active');
+    }
+
+    function closeSuccessModal() {
+        successModal.classList.remove('active');
+    }
+
+    function saveApiKey() {
+        apiKey = apiKeyInput.value.trim();
+        localStorage.setItem('gemini_api_key', apiKey);
+        alert('API 키가 저장되었습니다!');
+        closeModal();
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                currentImg = img;
+                resetToInitialState();
+                document.getElementById('placeholder').style.display = 'none';
+                canvas.style.display = 'block';
+                document.getElementById('detectBtn').disabled = false;
+                document.getElementById('resetBtn').disabled = false;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function resetToInitialState() {
+        detectedShapes = [];
+        fillCtx.clearRect(0, 0, fillCanvas.width, fillCanvas.height);
+        document.getElementById('resultSummary').style.display = 'none';
+        renderInitialImage();
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        if (currentImg) {
+            resetToInitialState();
+            speak('도형을 찾기 전 사진으로 돌아왔습니다.');
+        }
+    });
+
+    function renderInitialImage() {
+        const wrapper = document.getElementById('canvasWrapper');
+        const maxW = wrapper.clientWidth - 20;
+        const maxH = 600;
+
+        let w = currentImg.width;
+        let h = currentImg.height;
+
+        const ratio = Math.min(maxW / w, maxH / h);
+        canvas.width = w * ratio;
+        canvas.height = h * ratio;
+
+        fillCanvas.width = canvas.width;
+        fillCanvas.height = canvas.height;
+
+        redrawFullCanvas();
+    }
+
+    document.getElementById('detectBtn').addEventListener('click', async function() {
+        if (!apiKey) {
+            alert('먼저 API 키를 입력해 주세요!');
+            document.getElementById('openApiModalBtn').click();
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loadingText').innerText = "도형을 찾는 중.";
+
+        const base64Data = canvas.toDataURL('image/jpeg').split(',')[1];
+        
+        const prompt = `Analyze this image and identify shape types and boundaries. EXCLUDE star and heart.
+        IMPORTANT: Be flexible with TRIANGLES. Any real-world object with a roughly triangular or 3-corner structure (e.g., roof, wedge, sign, slice, arrow head) should be detected as a triangle.
+        
+        Classify shapes into:
+        - Circle / Ellipse: "원" (circle), "타원" (ellipse)
+        - Triangles: "정삼각형" (equilateral_triangle), "이등변삼각형" (isosceles_triangle), "직각삼각형" (right_triangle), or general "삼각형" (triangle)
+        - Quadrilaterals: "정사각형" (square), "직사각형" (rectangle), or general "사각형" (quadrilateral)
+
+        Return ONLY a JSON array of objects.
+        Each object MUST contain:
+        - "name": Korean shape name ("원", "타원", "정삼각형", "이등변삼각형", "직각삼각형", "정사각형", "직사각형", "삼각형", "사각형" 등)
+        - "type": "circle" | "ellipse" | "equilateral_triangle" | "isosceles_triangle" | "right_triangle" | "triangle" | "square" | "rectangle"
+        - "box_2d": [ymin, xmin, ymax, xmax] normalized from 0 to 1000.
+        Example: [{"name":"삼각형", "type":"triangle", "box_2d":[100,200,300,400]}]`;
+
+        const candidateModels = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'];
+        let successData = null;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+        try {
+            for (const model of candidateModels) {
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: prompt },
+                                    { inline_data: { mime_type: 'image/jpeg', data: base64Data } }
+                                ]
+                            }]
+                        })
+                    });
+                    const data = await response.json();
+                    if (!data.error) {
+                        successData = data;
+                        break;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') throw e;
+                }
             }
-          });
-          capturedEnemy = true;
-          await showCustomAlert("⚔️ 말 잡기 성공!", "상대방 말을 잡았습니다! 한번 더 던지세요!");
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                document.getElementById('loading').style.display = 'none';
+                alert('다른 사진으로 다시 시도해주세요.');
+                return;
+            }
+        } finally {
+            clearTimeout(timeoutId);
         }
-      }
-    }
 
-    if (piece.group && piece.group.length > 0) {
-      piece.group.forEach(gId => {
-        const gPiece = gameState.pieces.find(x => x.id === gId);
-        if (gPiece) {
-          gPiece.pos = piece.pos;
-          gPiece.status = piece.status;
+        document.getElementById('loading').style.display = 'none';
+
+        if (!successData) {
+            alert('다른 사진으로 다시 시도해주세요.');
+            return;
         }
-      });
-    }
 
-    return capturedEnemy;
-  }
+        try {
+            let text = successData.candidates[0].content.parts[0].text;
+            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            detectedShapes = JSON.parse(text);
 
-  function nextTurn() {
-    const currentTeamColor = TEAM_COLORS[gameState.currentTeamIdx];
-    gameState.teamPieceTurnIndices[currentTeamColor]++;
-
-    gameState.currentTurnIndex = (gameState.currentTurnIndex + 1) % gameState.turnOrder.length;
-    gameState.currentTeamIdx = gameState.turnOrder[gameState.currentTurnIndex];
-  }
-
-  function checkGameEnd() {
-    for (let t = 0; t < config.teamCount; t++) {
-      const color = TEAM_COLORS[t];
-      const finished = gameState.pieces.filter(p => p.team === color && p.status === 'finished');
-      if (finished.length === config.pieceCount) {
-        showVictoryModal(color);
-        break;
-      }
-    }
-  }
-
-  function showVictoryModal(winnerColor) {
-    const winnerName = TEAM_NAMES[winnerColor];
-
-    document.getElementById('victory-title').innerText = `🏆 ${winnerName} 팀 최종 승리! 🏆`;
-    document.getElementById('victory-subtext').innerText = `${winnerName} 팀의 모든 말이 목표에 도착했습니다!`;
-
-    const container = document.getElementById('result-details-container');
-    container.innerHTML = '';
-
-    for (let t = 0; t < config.teamCount; t++) {
-      const color = TEAM_COLORS[t];
-      const finishedCount = gameState.pieces.filter(p => p.team === color && p.status === 'finished').length;
-
-      const row = document.createElement('div');
-      row.className = 'result-row';
-      row.innerHTML = `
-        <div class="result-row-top">
-          <span style="font-weight:bold; font-size:22px; color:${color.toLowerCase()}">${TEAM_NAMES[color]} 팀</span>
-          <span class="rank-badge" style="background:${color.toLowerCase()}">${finishedCount} / ${config.pieceCount} 완주</span>
-        </div>
-      `;
-      container.appendChild(row);
-    }
-
-    document.getElementById('btn-resume-game').style.display = 'none';
-    document.getElementById('victory-modal').style.display = 'flex';
-  }
-
-  function stopGameManual() {
-    document.getElementById('victory-title').innerText = `⏹️ 경기 중도 종료`;
-    document.getElementById('victory-subtext').innerText = `경기가 중도에 종료되었습니다. 현시점 경기 진행 결과입니다.`;
-
-    const container = document.getElementById('result-details-container');
-    container.innerHTML = '';
-
-    for (let t = 0; t < config.teamCount; t++) {
-      const color = TEAM_COLORS[t];
-      const finishedCount = gameState.pieces.filter(p => p.team === color && p.status === 'finished').length;
-
-      const row = document.createElement('div');
-      row.className = 'result-row';
-      row.innerHTML = `
-        <div class="result-row-top">
-          <span style="font-weight:bold; font-size:22px; color:${color.toLowerCase()}">${TEAM_NAMES[color]} 팀</span>
-          <span class="rank-badge" style="background:${color.toLowerCase()}">${finishedCount} / ${config.pieceCount} 완주</span>
-        </div>
-      `;
-      container.appendChild(row);
-    }
-
-    document.getElementById('btn-resume-game').style.display = 'inline-block';
-    document.getElementById('victory-modal').style.display = 'flex';
-  }
-
-  function resumeGameFromModal() { closeModal('victory-modal'); }
-  function resetGameFromModal() { closeModal('victory-modal'); resetGame(); }
-  function goHomeFromModal() { closeModal('victory-modal'); goHome(); }
-  function resetGame() { resetGameState(true); }
-  function goHome() {
-    document.getElementById('game-screen').style.display = 'none';
-    document.getElementById('start-screen').style.display = 'block';
-  }
-
-  function openGroupSelectModal() {
-    if (gameState.selectedPieceId === null) {
-      showCustomAlert("⚠️ 말 미선택", "업기를 진행할 대표 말을 먼저 선택해 주세요.");
-      return;
-    }
-    const p = gameState.pieces.find(x => x.id === gameState.selectedPieceId);
-    if (p.status !== 'active') {
-      showCustomAlert("⚠️ 선택 오류", "윷판 위에 올라가 있는 말만 업기를 할 수 있습니다.");
-      return;
-    }
-
-    const sameCandidates = gameState.pieces.filter(x => 
-      x.team === p.team && 
-      x.id !== p.id && 
-      x.status === 'active' && 
-      x.pos === p.pos &&
-      !p.group.includes(x.id) &&
-      !gameState.pieces.some(parent => parent.group && parent.group.includes(x.id))
-    );
-
-    if (sameCandidates.length === 0) {
-      showCustomAlert("안내", "같은 칸에 새로 업을 수 있는 동일한 팀의 말이 없습니다.");
-      return;
-    }
-
-    const listContainer = document.getElementById('group-select-list');
-    listContainer.innerHTML = '';
-
-    sameCandidates.forEach(c => {
-      const item = document.createElement('label');
-      item.className = 'group-select-item';
-      item.innerHTML = `
-        <input type="checkbox" value="${c.id}" checked>
-        <span>${getFullPieceName(c)} (${c.pos}번 칸)</span>
-      `;
-      listContainer.appendChild(item);
+            drawShapesAndSummary();
+            speak('사진 속 도형들을 모두 찾았어요! 테두리 안쪽을 예쁘게 색칠해보세요!');
+        } catch (err) {
+            alert('다른 사진으로 다시 시도해주세요.');
+        }
     });
 
-    document.getElementById('group-modal').style.display = 'flex';
-  }
+    function drawShapesAndSummary() {
+        fillCtx.clearRect(0, 0, fillCanvas.width, fillCanvas.height);
+        
+        const shapeCounts = {};
 
-  function confirmGrouping() {
-    saveHistory();
-    const checkboxes = document.querySelectorAll('#group-select-list input[type="checkbox"]:checked');
-    const p = gameState.pieces.find(x => x.id === gameState.selectedPieceId);
+        detectedShapes.forEach(shape => {
+            shapeCounts[shape.name] = (shapeCounts[shape.name] || 0) + 1;
 
-    checkboxes.forEach(cb => {
-      const targetId = parseInt(cb.value);
-      if (!p.group.includes(targetId)) p.group.push(targetId);
-      
-      const targetPiece = gameState.pieces.find(x => x.id === targetId);
-      if (targetPiece && targetPiece.group) {
-        targetPiece.group.forEach(gId => {
-          if (!p.group.includes(gId)) p.group.push(gId);
+            const [ymin, xmin, ymax, xmax] = shape.box_2d;
+            const x = (xmin / 1000) * canvas.width;
+            const y = (ymin / 1000) * canvas.height;
+            const w = ((xmax - xmin) / 1000) * canvas.width;
+            const h = ((ymax - ymin) / 1000) * canvas.height;
+
+            shape.canvasBounds = { x, y, w, h, completed: false };
         });
-        targetPiece.group = [];
-      }
-    });
 
-    closeModal('group-modal');
-    updateUI();
-    showCustomAlert("🤝 업기 완료", "선택한 말들을 지정된 말로 엎었습니다!");
-  }
+        redrawFullCanvas();
 
-  function openUngroupSelectModal() {
-    if (gameState.selectedPieceId === null) {
-      showCustomAlert("⚠️ 말 미선택", "업기 해제할 말을 먼저 선택해 주세요.");
-      return;
-    }
-    const p = gameState.pieces.find(x => x.id === gameState.selectedPieceId);
-    if (!p.group || p.group.length === 0) {
-      showCustomAlert("안내", "선택한 말은 현재 다른 말을 업고 있지 않습니다.");
-      return;
+        let html = `총 <b>${detectedShapes.length}개</b>의 도형 발견! ( `;
+        const summaryItems = [];
+        for (const [name, count] of Object.entries(shapeCounts)) {
+            summaryItems.push(`${name}: ${count}개`);
+        }
+        html += summaryItems.join(' / ') + ' )';
+
+        document.getElementById('summaryContent').innerHTML = html;
+        document.getElementById('resultSummary').style.display = 'block';
     }
 
-    const listContainer = document.getElementById('ungroup-select-list');
-    listContainer.innerHTML = '';
+    function defineShapePath(context, shape) {
+        const { x, y, w, h } = shape.canvasBounds;
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        const type = shape.type || 'rectangle';
 
-    p.group.forEach(gId => {
-      const gPiece = gameState.pieces.find(x => x.id === gId);
-      if (gPiece) {
-        const item = document.createElement('label');
-        item.className = 'group-select-item';
-        item.innerHTML = `
-          <input type="checkbox" value="${gPiece.id}" checked>
-          <span>${gPiece.name} (떼어내어 독립)</span>
-        `;
-        listContainer.appendChild(item);
-      }
+        context.beginPath();
+
+        if (type === 'circle' || type === 'ellipse') {
+            const rx = w / 2;
+            const ry = h / 2;
+            context.ellipse(cx, cy, Math.abs(rx), Math.abs(ry), 0, 0, 2 * Math.PI);
+        } else if (type === 'right_triangle') {
+            context.moveTo(x, y);
+            context.lineTo(x, y + h);
+            context.lineTo(x + w, y + h);
+            context.closePath();
+        } else if (type === 'equilateral_triangle' || type === 'isosceles_triangle' || type === 'triangle') {
+            context.moveTo(cx, y);
+            context.lineTo(x + w, y + h);
+            context.lineTo(x, y + h);
+            context.closePath();
+        } else {
+            context.rect(x, y, w, h);
+        }
+    }
+
+    function redrawFullCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (currentImg) {
+            ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+        }
+
+        ctx.drawImage(fillCanvas, 0, 0);
+
+        detectedShapes.forEach(shape => {
+            if (!shape.canvasBounds) return;
+
+            defineShapePath(ctx, shape);
+
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const { x, y, h } = shape.canvasBounds;
+            const tagY = Math.min(canvas.height - 24, y + h + 6);
+            const tagW = Math.max(60, shape.name.length * 16);
+
+            ctx.fillStyle = '#4f46e5';
+            ctx.fillRect(x, tagY, tagW, 24);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px Pretendard';
+            ctx.fillText(shape.name, x + 6, tagY + 17);
+        });
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
+    canvas.addEventListener('touchmove', (e) => {
+        draw(e.touches[0]);
+        e.preventDefault();
+    });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    function startDrawing(e) {
+        if (!detectedShapes.length) return;
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        lastX = e.clientX - rect.left;
+        lastY = e.clientY - rect.top;
+        draw(e);
+    }
+
+    function draw(e) {
+        if (!isDrawing || !detectedShapes.length) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const currX = e.clientX - rect.left;
+        const currY = e.clientY - rect.top;
+        const size = document.getElementById('brushSize').value;
+
+        detectedShapes.forEach(shape => {
+            if (!shape.canvasBounds) return;
+
+            fillCtx.save();
+            defineShapePath(fillCtx, shape);
+            fillCtx.clip();
+
+            fillCtx.lineWidth = size;
+            fillCtx.lineCap = 'round';
+            fillCtx.lineJoin = 'round';
+
+            if (isEraser) {
+                fillCtx.globalCompositeOperation = 'destination-out';
+            } else {
+                fillCtx.globalCompositeOperation = 'source-over';
+                fillCtx.strokeStyle = currentColor;
+            }
+
+            fillCtx.beginPath();
+            fillCtx.moveTo(lastX, lastY);
+            fillCtx.lineTo(currX, currY);
+            fillCtx.stroke();
+
+            fillCtx.restore();
+        });
+
+        lastX = currX;
+        lastY = currY;
+
+        redrawFullCanvas();
+        check90PercentCompletion();
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    // 도형 색칠 완성 및 전체 완칠 검사 로직
+    function check90PercentCompletion() {
+        detectedShapes.forEach(shape => {
+            if (!shape.canvasBounds || shape.canvasBounds.completed) return;
+
+            const { x, y, w, h } = shape.canvasBounds;
+            if (w <= 0 || h <= 0) return;
+
+            const imgData = fillCtx.getImageData(x, y, w, h);
+            const pixels = imgData.data;
+            let coloredCount = 0;
+            let totalSampled = 0;
+
+            for (let i = 0; i < pixels.length; i += 16) {
+                totalSampled++;
+                if (pixels[i + 3] > 100) coloredCount++;
+            }
+
+            const fillRatio = coloredCount / totalSampled;
+
+            if (fillRatio >= 0.82) {
+                shape.canvasBounds.completed = true;
+
+                fillCtx.save();
+                defineShapePath(fillCtx, shape);
+                fillCtx.clip();
+                fillCtx.fillStyle = currentColor;
+                fillCtx.fillRect(x, y, w, h);
+                fillCtx.restore();
+
+                redrawFullCanvas();
+
+                // 개별 완성 시에는 음성 안내만 제공
+                speak(`${shape.name} 완성!`);
+
+                // 모든 도형이 완성되었는지 체크
+                checkAllShapesCompleted();
+            }
+        });
+    }
+
+    // 사진 속 모든 도형을 다 채웠는지 확인하는 함수
+    function checkAllShapesCompleted() {
+        if (!detectedShapes.length) return;
+
+        const allCompleted = detectedShapes.every(shape => shape.canvasBounds && shape.canvasBounds.completed);
+
+        if (allCompleted) {
+            setTimeout(() => {
+                playSuccessSound();
+                speak('잘했어요! 도형을 전부 다 색칠했어요.');
+                successModal.classList.add('active');
+            }, 300);
+        }
+    }
+
+    document.querySelectorAll('.color-dot').forEach(dot => {
+        dot.addEventListener('click', function() {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            this.classList.add('active');
+            currentColor = this.dataset.color;
+            isEraser = false;
+        });
     });
 
-    document.getElementById('ungroup-modal').style.display = 'flex';
-  }
-
-  function confirmUngrouping() {
-    saveHistory();
-    const checkboxes = document.querySelectorAll('#ungroup-select-list input[type="checkbox"]:checked');
-    const p = gameState.pieces.find(x => x.id === gameState.selectedPieceId);
-
-    checkboxes.forEach(cb => {
-      const targetId = parseInt(cb.value);
-      p.group = p.group.filter(id => id !== targetId);
+    document.getElementById('eraserBtn').addEventListener('click', () => {
+        isEraser = true;
     });
 
-    closeModal('ungroup-modal');
-    updateUI();
-    showCustomAlert("🔓 업기 해제 완료", "선택한 말을 업기 목록에서 해제하여 별개의 말로 분리했습니다.");
-  }
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ko-KR';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+        }
+    }
 </script>
+
 </body>
 </html>
